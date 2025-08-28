@@ -72,15 +72,28 @@ jobs:
           echo "### Changes" > changelog.md
           echo "" >> changelog.md
           
+          # Function to get the starting point for changelog
+          get_start_point() {
+            # Try to get the latest tag
+            local latest_tag=$(git describe --tags --abbrev=0 2>/dev/null)
+            if [ $? -eq 0 ]; then
+              echo "$latest_tag"
+            else
+              # If no tags exist, get the first commit
+              echo "$(git rev-list --max-parents=0 HEAD)"
+            fi
+          }
+
           # Function to check if commit message starts with a specific type
           filter_commits() {
             local type=$1
             local description=$2
-            local commits=$(git log $(git describe --tags --abbrev=0 2>/dev/null || echo "HEAD~100")..HEAD --pretty=format:"* %s" | grep "^* $type")
+            local start_point=$(get_start_point)
+            local commits=$(git log $start_point..HEAD --pretty=format:"* %s" | grep "^$type")
             if [ ! -z "$commits" ]; then
               echo "#### $description" >> changelog.md
               echo "" >> changelog.md
-              echo "$commits" | sed 's/^* '$type': /* /' >> changelog.md
+              echo "$commits" | sed "s/^$type: /* /" >> changelog.md
               echo "" >> changelog.md
             fi
           }
@@ -94,7 +107,8 @@ jobs:
           filter_commits "chore" "Maintenance"
           
           # Get uncategorized commits
-          OTHER_COMMITS=$(git log $(git describe --tags --abbrev=0 2>/dev/null || echo "HEAD~100")..HEAD --pretty=format:"* %s" | grep -v "^* \(feat\|fix\|docs\|refactor\|test\|chore\)")
+          start_point=$(get_start_point)
+          OTHER_COMMITS=$(git log $start_point..HEAD --pretty=format:"* %s" | grep -v "^\(feat\|fix\|docs\|refactor\|test\|chore\):")
           if [ ! -z "$OTHER_COMMITS" ]; then
             echo "#### Other Changes" >> changelog.md
             echo "" >> changelog.md
