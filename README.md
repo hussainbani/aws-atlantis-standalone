@@ -1,6 +1,9 @@
-# AWS Atlantis Standalone
+# Terraform AWS Atlantis Standalone Module
 
-A standalone Terraform module for deploying self-hosted Atlantis server on AWS with optional load balancer and authentication features.
+[![Terraform Registry](https://img.shields.io/badge/terraform-registry-blue.svg)](https://registry.terraform.io/modules/hussainbani/atlantis-standalone/aws)
+[![GitHub tag (latest SemVer)](https://img.shields.io/github/v/tag/hussainbani/terraform-aws-atlantis-standalone)](https://github.com/hussainbani/terraform-aws-atlantis-standalone/tags)
+
+This Terraform module deploys a self-hosted Atlantis server on AWS with optional load balancer and authentication features.
 
 > **Note**: This module is specifically designed for AWS and uses AWS GitHub App integration for authentication.
 
