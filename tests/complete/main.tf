@@ -7,9 +7,9 @@ locals {
 
 module "atlantis_complete" {
   source = "../../"
-  
+
   providers = {
-    aws    = aws
+    aws     = aws
     aws.r53 = aws.r53
   }
 
@@ -21,19 +21,19 @@ module "atlantis_complete" {
   ami           = data.aws_ami.ubuntu.id
 
   # Network Configuration
-  vpc_id             = data.aws_vpc.main.id
-  subnet_id          = data.aws_subnet.private.id
-  mgmt_subnets       = [data.aws_vpc.main.cidr_block]
+  vpc_id              = data.aws_vpc.main.id
+  subnet_id           = data.aws_subnet.private.id
+  mgmt_subnets        = [data.aws_vpc.main.cidr_block]
   lb_frontend_subnets = data.aws_subnet.public[*].id
 
   # DNS Configuration
   r53_zone_id = var.r53_zone_id
 
   # Feature Flags
-  create_alb                 = true
+  create_alb                = true
   create_dns_records        = true
   enable_web_authentication = true
-  eip                      = false
+  eip                       = false
 
   # Authentication
   atlantis_username = "admin"
@@ -42,8 +42,8 @@ module "atlantis_complete" {
   # GitHub Configuration (Replace with valid values)
   github_app_private_key     = "base64-encoded-private-key"
   atlantis_gh_webhook_secret = "your-webhook-secret"
-  atlantis_gh_app_id        = "123456"
-  repo_allowlist            = "github.com/yourorg/*"
+  atlantis_gh_app_id         = "123456"
+  repo_allowlist             = "github.com/yourorg/*"
 
   # AWS Credentials (Replace with valid credentials)
   aws_credentials_base64 = "base64-encoded-aws-credentials"
@@ -63,10 +63,10 @@ module "atlantis_complete" {
   atlantis_security_group_rules = [
     {
       type                     = "ingress"
-      from_port               = 8080
-      to_port                 = 8080
-      protocol                = "tcp"
-      description             = "Custom application access"
+      from_port                = 8080
+      to_port                  = 8080
+      protocol                 = "tcp"
+      description              = "Custom application access"
       source_security_group_id = "sg-1234567890" # Replace with valid SG ID
     }
   ]

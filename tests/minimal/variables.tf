@@ -43,7 +43,7 @@ variable "r53_zone_id" {
 variable "lb_frontend_subnets" {
   description = "List of subnet IDs for the load balancer frontend"
   type        = list(string)
-  default     = []  # Empty list since ALB is disabled in minimal setup
+  default     = [] # Empty list since ALB is disabled in minimal setup
 }
 
 

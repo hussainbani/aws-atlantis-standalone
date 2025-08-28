@@ -226,13 +226,13 @@ variable "alb_security_group_rules" {
   description = "Additional security group rules for ALB. Each rule can specify either cidr_blocks, source_security_group_id, or prefix_list_ids"
   type = list(object({
     type                     = string
-    from_port               = number
-    to_port                 = number
-    protocol                = string
-    description             = string
-    cidr_blocks             = optional(list(string))
+    from_port                = number
+    to_port                  = number
+    protocol                 = string
+    description              = string
+    cidr_blocks              = optional(list(string))
     source_security_group_id = optional(string)
-    self                    = optional(bool)
+    self                     = optional(bool)
   }))
   default = []
 }
@@ -241,13 +241,13 @@ variable "atlantis_security_group_rules" {
   description = "Additional security group rules for Atlantis instance. Each rule can specify either cidr_blocks, source_security_group_id, or prefix_list_ids"
   type = list(object({
     type                     = string
-    from_port               = number
-    to_port                 = number
-    protocol                = string
-    description             = string
-    cidr_blocks             = optional(list(string))
+    from_port                = number
+    to_port                  = number
+    protocol                 = string
+    description              = string
+    cidr_blocks              = optional(list(string))
     source_security_group_id = optional(string)
-    self                    = optional(bool)
+    self                     = optional(bool)
   }))
   default = []
 }

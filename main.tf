@@ -79,7 +79,7 @@ resource "aws_eip" "eip" {
 # DNS
 
 resource "aws_route53_record" "int" {
-  count = var.create_dns_records ? 1 : 0
+  count    = var.create_dns_records ? 1 : 0
   provider = aws.r53
   zone_id  = var.r53_zone_id
   name     = "${var.name}.int.${var.domain}"

@@ -7,9 +7,9 @@ locals {
 
 module "atlantis_private" {
   source = "../../"
-  
+
   providers = {
-    aws    = aws
+    aws     = aws
     aws.r53 = aws.r53
   }
 
@@ -21,19 +21,19 @@ module "atlantis_private" {
   ami           = data.aws_ami.ubuntu.id
 
   # Network Configuration
-  vpc_id             = data.aws_vpc.main.id
-  subnet_id          = data.aws_subnet.private.id
-  mgmt_subnets       = [data.aws_vpc.main.cidr_block]
+  vpc_id              = data.aws_vpc.main.id
+  subnet_id           = data.aws_subnet.private.id
+  mgmt_subnets        = [data.aws_vpc.main.cidr_block]
   lb_frontend_subnets = [data.aws_subnet.private_a.id, data.aws_subnet.private_b.id]
 
   # DNS Configuration
   r53_zone_id = data.aws_route53_zone.main.zone_id
 
   # Feature Flags - Private ALB setup
-  create_alb                 = true
+  create_alb                = true
   create_dns_records        = true
   enable_web_authentication = true
-  eip                      = false
+  eip                       = false
 
   # Authentication
   atlantis_username = "admin"
@@ -42,8 +42,8 @@ module "atlantis_private" {
   # GitHub Configuration
   github_app_private_key     = var.github_app_key
   atlantis_gh_webhook_secret = var.webhook_secret
-  atlantis_gh_app_id        = var.github_app_id
-  repo_allowlist            = "github.com/${var.github_org}/*"
+  atlantis_gh_app_id         = var.github_app_id
+  repo_allowlist             = "github.com/${var.github_org}/*"
 
   # AWS Credentials
   aws_credentials_base64 = var.aws_credentials

@@ -1,9 +1,9 @@
 #ATLANTIS ALB
 module "alb" {
-  count  = var.create_alb ? 1 : 0
-  source = "terraform-aws-modules/alb/aws"
+  count   = var.create_alb ? 1 : 0
+  source  = "terraform-aws-modules/alb/aws"
   version = "8.7.0"
-  
+
   providers = {
     aws = aws
   }
@@ -11,10 +11,10 @@ module "alb" {
 
   load_balancer_type = "application"
 
-  vpc_id          = var.vpc_id
-  subnets         = var.lb_frontend_subnets
+  vpc_id                = var.vpc_id
+  subnets               = var.lb_frontend_subnets
   create_security_group = false
-  security_groups = [module.alb-sg[0].security_group_id]
+  security_groups       = [module.alb-sg[0].security_group_id]
 
 
   target_groups = [
@@ -70,7 +70,7 @@ module "alb" {
 
 
 resource "aws_route53_record" "atlantis" {
-  count = var.create_dns_records ? 1 : 0
+  count    = var.create_dns_records ? 1 : 0
   provider = aws.r53
   zone_id  = var.r53_zone_id
   name     = local.atlantis_domain
