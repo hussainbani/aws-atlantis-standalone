@@ -1,0 +1,7 @@
+# Example terraform.tfvars for private-alb test
+github_app_key    = "base64_encoded_key_here"
+github_app_id     = "123456"
+webhook_secret    = "webhook_secret_here"
+aws_credentials   = "base64_encoded_credentials_here"
+domain           = "example.com"
+github_org       = "your-org"
