@@ -42,7 +42,7 @@ jobs:
 
   bump_version_tag_and_release:
     if: "!startsWith(github.event.head_commit.message, 'bump:')"
-    runs-on: ${{ inputs.hostOS }}
+    runs-on: ubuntu-latest
     name: "Bump version and create changelog with commitizen"
     steps:
       - name: Check out
