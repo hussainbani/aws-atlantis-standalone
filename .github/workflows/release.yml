@@ -1,0 +1,124 @@
+name: Create Release
+
+on:
+  push:
+    branches:
+      - main
+    paths-ignore:
+      - '**.md'
+      - '.gitignore'
+      - '.github/**'
+
+jobs:
+  validate:
+    name: Validate
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v2
+        with:
+          terraform_version: 1.6.0
+
+      - name: Terraform Format Check
+        run: terraform fmt -check -recursive
+
+      - name: Terraform Init
+        run: |
+          cd tests/minimal
+          terraform init -backend=false
+
+      - name: Terraform Validate
+        run: |
+          cd tests/minimal
+          terraform validate
+
+  release:
+    name: Create Release
+    needs: validate
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+
+      - name: Install GitVersion
+        uses: GitTools/setup-gitversion@v0.9.7
+        with:
+          versionSpec: '5.x'
+
+      - name: Determine Version
+        id: gitversion
+        uses: GitTools/actions/gitversion/execute@v0.9.7
+        with:
+          useConfigFile: true
+          configFilePath: GitVersion.yml
+
+      - name: Display GitVersion outputs
+        run: |
+          echo "Major: ${{ steps.gitversion.outputs.major }}"
+          echo "Minor: ${{ steps.gitversion.outputs.minor }}"
+          echo "Patch: ${{ steps.gitversion.outputs.patch }}"
+          echo "SemVer: ${{ steps.gitversion.outputs.semVer }}"
+
+      - name: Generate changelog
+        id: changelog
+        run: |
+          echo "### Changes" > changelog.md
+          echo "" >> changelog.md
+          
+          # Function to check if commit message starts with a specific type
+          filter_commits() {
+            local type=$1
+            local description=$2
+            local commits=$(git log ${{ steps.latest_tag.outputs.LATEST_TAG }}..HEAD --pretty=format:"* %s" | grep "^* $type")
+            if [ ! -z "$commits" ]; then
+              echo "#### $description" >> changelog.md
+              echo "" >> changelog.md
+              echo "$commits" | sed 's/^* '$type': /* /' >> changelog.md
+              echo "" >> changelog.md
+            fi
+          }
+          
+          # Generate categorized changes
+          filter_commits "feat" "New Features"
+          filter_commits "fix" "Bug Fixes"
+          filter_commits "docs" "Documentation Updates"
+          filter_commits "refactor" "Code Refactoring"
+          filter_commits "test" "Tests"
+          filter_commits "chore" "Maintenance"
+          
+          # Get uncategorized commits
+          OTHER_COMMITS=$(git log ${{ steps.latest_tag.outputs.LATEST_TAG }}..HEAD --pretty=format:"* %s" | grep -v "^* \(feat\|fix\|docs\|refactor\|test\|chore\)")
+          if [ ! -z "$OTHER_COMMITS" ]; then
+            echo "#### Other Changes" >> changelog.md
+            echo "" >> changelog.md
+            echo "$OTHER_COMMITS" >> changelog.md
+          fi
+          
+          # Escape content for GitHub Actions
+          CHANGELOG=$(cat changelog.md)
+          CHANGELOG="${CHANGELOG//'%'/'%25'}"
+          CHANGELOG="${CHANGELOG//$'\n'/'%0A'}"
+          CHANGELOG="${CHANGELOG//$'\r'/'%0D'}"
+          echo "CHANGELOG=${CHANGELOG}" >> $GITHUB_OUTPUT
+
+      - name: Create Release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: v${{ steps.gitversion.outputs.semVer }}
+          release_name: Release v${{ steps.gitversion.outputs.semVer }}
+          body: |
+            ${{ steps.changelog.outputs.CHANGELOG }}
+            
+            **Full Changelog**: https://github.com/${{ github.repository }}/compare/v${{ steps.gitversion.outputs.previousVersion }}...v${{ steps.gitversion.outputs.semVer }}
+          draft: false
+          prerelease: false
