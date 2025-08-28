@@ -1,6 +1,6 @@
-# Atlantis Module Tests
+# AWS Atlantis Standalone Tests
 
-This directory contains test configurations for the Atlantis module.
+This directory contains test configurations for the AWS Atlantis Standalone module.
 
 ## Test Configurations
 

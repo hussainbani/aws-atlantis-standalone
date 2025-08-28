@@ -33,11 +33,7 @@ variable "environment" {
   default     = "test"
 }
 
-variable "mahi_region" {
-  description = "MahiFX region used for classification"
-  type        = string
-  default     = "us-east-1"
-}
+
 
 variable "r53_zone_id" {
   description = "Route53 zone ID"

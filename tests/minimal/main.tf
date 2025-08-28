@@ -24,7 +24,6 @@ module "atlantis_minimal" {
   name              = local.name
   region            = local.region
   domain            = var.domain
-  mahi_region      = var.mahi_region
   instance_type     = "t3.small"
   ami               = data.aws_ami.ubuntu.id
   vpc_id            = data.aws_vpc.main.id

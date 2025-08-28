@@ -1,6 +1,6 @@
-# Terraform Atlantis Module
+# AWS Atlantis Standalone
 
-This module deploys a self-hosted Atlantis server on AWS with optional load balancer and authentication features.
+A standalone Terraform module for deploying self-hosted Atlantis server on AWS with optional load balancer and authentication features.
 
 > **Note**: This module is specifically designed for AWS and uses AWS GitHub App integration for authentication.
 
@@ -53,11 +53,37 @@ For detailed instructions on setting up GitHub App for Atlantis, refer to:
 - Customizable IAM roles and policies
 - EIP support for direct instance access
 
+## Important Note About Server Configuration
+
+> **Warning**: The Atlantis server is configured exclusively through CloudInit when the instance is first launched. Any changes to the server configuration parameters in Terraform will not affect the running instance. To apply server configuration changes, you must:
+> 1. Make the desired changes in the configuration
+> 2. Manually terminate the existing instance
+> 3. Apply the Terraform configuration to create a new instance with the updated settings
+>
+> This limitation is by design to prevent unexpected server restarts or configuration changes during infrastructure updates.
+
+## Modules
+
+This project uses the following modules:
+
+### Public Modules
+- `terraform-aws-modules/alb/aws` (v8.7.0): Used for Application Load Balancer configuration
+- `terraform-aws-modules/security-group/aws` (v5.1.0): Used for managing security groups
+
+### AWS Provider Modules
+The following AWS resources are used:
+- `aws_instance`: For EC2 instance deployment
+- `aws_network_interface`: For network interface configuration
+- `aws_ebs_volume`: For EBS volume management
+- `aws_iam_*`: For IAM roles and policies
+- `aws_acm_*`: For SSL certificate management (when ALB is enabled)
+- `aws_route53_*`: For DNS management (optional)
+
 ## Usage
 
 ```hcl
 module "atlantis" {
-  source = "path/to/module"
+  source = "github.com/hussainbani/aws-atlantis-standalone"
 
   name          = "atlantis"
   ami           = "ami-1234567890"
@@ -199,7 +225,7 @@ This module is exclusively designed for AWS and requires:
 
 | Name | Description | Type | Default |
 |------|-------------|------|---------|
-| mahi_region | MahiFX region for hiera classification | string | |
+| region | AWS region for deployment | string | |
 | availability_zone | AZ for the instance | string | "" |
 | key_name | SSH key name | string | "deploy" |
 | root_volume_type | EBS root volume type | string | "gp3" |
@@ -238,7 +264,7 @@ This module is exclusively designed for AWS and requires:
 
 | Name | Description | Type | Default |
 |------|-------------|------|---------|
-| repo_allowlist | List of repositories Atlantis can access | string | "github.com/MahiFX/*" |
+| repo_allowlist | List of repositories Atlantis can access | string | "github.com/org/*" |
 
 ### Additional Configuration
 

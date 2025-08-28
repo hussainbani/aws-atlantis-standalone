@@ -1,10 +1,17 @@
-variable "ami" {}
-variable "region" {}
-variable "mahi_region" {
-  description = "MahiFX region, used for hiera clasification"
+variable "ami" {
+  description = "AMI ID for the Atlantis instance"
   type        = string
 }
-variable "domain" {}
+
+variable "region" {
+  description = "AWS region for deployment"
+  type        = string
+}
+
+variable "domain" {
+  description = "Domain name for Atlantis server (e.g., atlantis.example.com)"
+  type        = string
+}
 
 variable "create_alb" {
   description = "Whether to create Application Load Balancer"
@@ -31,34 +38,45 @@ variable "eip" {
 }
 
 variable "availability_zone" {
-  type    = string
-  default = ""
+  description = "AWS availability zone for the instance (if not specified, will be chosen automatically)"
+  type        = string
+  default     = ""
 }
 
 variable "mgmt_subnets" {
-  type = list(string)
+  description = "List of CIDR blocks for management access (SSH and HTTPS)"
+  type        = list(string)
+  default     = []
 }
 
 variable "key_name" {
-  type    = string
-  default = "deploy"
+  description = "Name of SSH key pair to attach to the instance"
+  type        = string
+  default     = "deploy"
 }
 
-variable "r53_zone_id" {}
+variable "r53_zone_id" {
+  description = "Route53 hosted zone ID for DNS records"
+  type        = string
+}
 
 variable "name" {
-  type = string
+  description = "Name prefix for all resources created by this module"
+  type        = string
 }
 
 variable "root_volume_type" {
-  type    = string
-  default = "gp3"
+  description = "EBS volume type for root volume (e.g., gp3, gp2, io1)"
+  type        = string
+  default     = "gp3"
 }
 
 variable "root_volume_size" {
-  type    = number
-  default = 15
+  description = "Size of the root volume in GB"
+  type        = number
+  default     = 15
 }
+
 variable "encrypted_volume" {
   description = "encrypted volume"
   type        = bool
@@ -116,40 +134,9 @@ variable "instance_type" {
 }
 
 variable "additional_tags" {
-  type    = map(any)
-  default = {}
-}
-
-locals {
-  location = replace(var.region, "-", "")
-
-  tags = {
-    Name       = var.name
-    managed_by = "terraform"
-  }
-
-  # Prepare a suitable map for for_each, used by aws_ebs_volume and
-  # aws_volume_attachment.
-  volumes = {
-    for volume in var.volumes :
-    volume.device => {
-      lv_name      = volume.lv_name
-      size         = volume.size
-      dlm_snapshot = volume.dlm_snapshot
-      type         = lookup(volume, "type", "gp3")
-    }
-  }
-
-  # Prepare a cut down volumes map suitable for the EC2 user-data.
-  user_data_volumes = [
-    for volume in var.volumes : {
-      device      = volume.device
-      lv_name     = volume.lv_name
-      mount_point = volume.mount_point
-    }
-  ]
-
-  atlantis_domain = "${var.name}.${var.domain}"
+  description = "Additional tags to apply to all resources created by this module"
+  type        = map(any)
+  default     = {}
 }
 
 # System versions
@@ -200,7 +187,7 @@ variable "github_app_private_key" {
 variable "repo_allowlist" {
   description = "List of repositories Atlantis can access"
   type        = string
-  default     = "github.com/MahiFX/*"
+  default     = "github.com/org/*"
 }
 
 

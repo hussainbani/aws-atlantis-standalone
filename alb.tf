@@ -13,6 +13,7 @@ module "alb" {
 
   vpc_id          = var.vpc_id
   subnets         = var.lb_frontend_subnets
+  create_security_group = false
   security_groups = [module.alb-sg[0].security_group_id]
 
 

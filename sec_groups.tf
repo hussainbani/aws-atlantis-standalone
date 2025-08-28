@@ -15,22 +15,22 @@ module "atlantis-sg" {
       from_port   = 0
       to_port     = 8
       protocol    = "icmp"
-      description = "Allow echo request from all VPN and VPC addresses"
+      description = "Allow echo request from all mgmt and VPC addresses"
       cidr_blocks = join(",", concat([data.aws_vpc.vpc.cidr_block], var.mgmt_subnets))
     },
     {
       from_port   = 22
       to_port     = 22
       protocol    = "tcp"
-      description = "allow_ssh_vpn_and_vpc"
+      description = "Allow SSH from all mgmt and VPC addresses"
       cidr_blocks = join(",", concat([data.aws_vpc.vpc.cidr_block], var.mgmt_subnets))
     },
     {
-      from_port   = 443
-      to_port     = 443
+      from_port   = 4141
+      to_port     = 4141
       protocol    = "tcp"
-      description = "https secure port"
-      cidr_blocks = join(",", var.mgmt_subnets)
+      description = "Allow atlantis from all mgmt and VPC addresses"
+      cidr_blocks =join(",", concat([data.aws_vpc.vpc.cidr_block], var.mgmt_subnets))
     }
   ], [
     # Additional CIDR-based ingress rules
@@ -52,7 +52,7 @@ module "atlantis-sg" {
         to_port                  = 4141
         protocol                = "tcp"
         description             = "atlantis default port"
-        source_security_group_id = module.alb[0].security_group_id
+        source_security_group_id = module.alb-sg[0].security_group_id
       }
     ] : [],
     [

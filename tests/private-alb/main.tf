@@ -17,7 +17,6 @@ module "atlantis_private" {
   name          = local.name
   region        = local.region
   domain        = local.domain
-  mahi_region   = local.region
   instance_type = "t3.small"
   ami           = data.aws_ami.ubuntu.id
 
