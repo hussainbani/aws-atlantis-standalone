@@ -76,7 +76,7 @@ jobs:
           filter_commits() {
             local type=$1
             local description=$2
-            local commits=$(git log ${{ steps.latest_tag.outputs.LATEST_TAG }}..HEAD --pretty=format:"* %s" | grep "^* $type")
+            local commits=$(git log $(git describe --tags --abbrev=0 2>/dev/null || echo "HEAD~100")..HEAD --pretty=format:"* %s" | grep "^* $type")
             if [ ! -z "$commits" ]; then
               echo "#### $description" >> changelog.md
               echo "" >> changelog.md
@@ -94,7 +94,7 @@ jobs:
           filter_commits "chore" "Maintenance"
           
           # Get uncategorized commits
-          OTHER_COMMITS=$(git log ${{ steps.latest_tag.outputs.LATEST_TAG }}..HEAD --pretty=format:"* %s" | grep -v "^* \(feat\|fix\|docs\|refactor\|test\|chore\)")
+          OTHER_COMMITS=$(git log $(git describe --tags --abbrev=0 2>/dev/null || echo "HEAD~100")..HEAD --pretty=format:"* %s" | grep -v "^* \(feat\|fix\|docs\|refactor\|test\|chore\)")
           if [ ! -z "$OTHER_COMMITS" ]; then
             echo "#### Other Changes" >> changelog.md
             echo "" >> changelog.md
