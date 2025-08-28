@@ -7,7 +7,6 @@ on:
     paths-ignore:
       - '**.md'
       - '.gitignore'
-      - '.github/**'
 
 jobs:
   validate:
@@ -49,13 +48,13 @@ jobs:
           fetch-depth: 0
 
       - name: Install GitVersion
-        uses: gittools/actions/gitversion/setup@v4.1.0
+        uses: gittools/actions/gitversion/setup@v3.2.1
         with:
-          versionSpec: '5.x'
+          versionSpec: '5.2.x'
 
       - name: Determine Version
         id: gitversion
-        uses: gittools/actions/gitversion/execute@v4.1.0
+        uses: gittools/actions/gitversion/execute@v3.2.1
         with:
           useConfigFile: true
           configFilePath: GitVersion.yml
